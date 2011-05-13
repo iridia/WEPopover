@@ -145,17 +145,14 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 	}
 }
 
-- (void)determineGeometryForSize:(CGSize)theSize anchorRect:(CGRect)anchorRect displayArea:(CGRect)displayArea permittedArrowDirections:(UIPopoverArrowDirection)supportedArrowDirections {	
-	
-	//Determine the frame, it should not go outside the display area
-	UIPopoverArrowDirection theArrowDirection = UIPopoverArrowDirectionUp;
-	
+- (void) determineGeometryForSize:(CGSize)theSize anchorRect:(CGRect)anchorRect displayArea:(CGRect)displayArea permittedArrowDirections:(UIPopoverArrowDirection)allowedDirections {	
+
 	offset =  CGPointZero;
-	bgRect = CGRectZero;
+	bgRect = CGRectNull;
 	arrowRect = CGRectZero;
 	arrowDirection = UIPopoverArrowDirectionUnknown;
 	
-	CGFloat biggestSurface = 0.0f;
+	CGFloat knownLargestSurface = 0.0f;
 	CGFloat currentMinMargin = 0.0f;
 	
 	UIImage *upArrowImage = [UIImage imageNamed:properties.upArrowImageName];
@@ -163,10 +160,11 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 	UIImage *leftArrowImage = [UIImage imageNamed:properties.leftArrowImageName];
 	UIImage *rightArrowImage = [UIImage imageNamed:properties.rightArrowImageName];
 	
-	while (theArrowDirection <= UIPopoverArrowDirectionRight) {
+	UIPopoverArrowDirection testingDirection = UIPopoverArrowDirectionUp;	
+	while (testingDirection <= UIPopoverArrowDirectionRight) {
 		
-		if ((supportedArrowDirections & theArrowDirection)) {
-			
+		if ((allowedDirections & testingDirection)) {
+		
 			CGRect theBgRect = CGRectZero;
 			CGRect theArrowRect = CGRectZero;
 			CGPoint theOffset = CGPointZero;
@@ -174,7 +172,7 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 			CGFloat yArrowOffset = 0.0;
 			CGPoint anchorPoint = CGPointZero;
 			
-			switch (theArrowDirection) {
+			switch (testingDirection) {
 				case UIPopoverArrowDirectionUp:
 					
 					anchorPoint = CGPointMake(CGRectGetMidX(anchorRect), CGRectGetMaxY(anchorRect));
@@ -185,11 +183,13 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					theOffset = CGPointMake(anchorPoint.x - xArrowOffset - upArrowImage.size.width / 2, anchorPoint.y  - yArrowOffset);
 					theBgRect = CGRectMake(0, 0, theSize.width, theSize.height);
 					
-					if (theOffset.x < 0) {
+					if (theOffset.x < CGRectGetMinX(displayArea)) {
 						xArrowOffset += theOffset.x;
-						theOffset.x = 0;
-					} else if (theOffset.x + theSize.width > displayArea.size.width) {
-						xArrowOffset += (theOffset.x + theSize.width - displayArea.size.width);
+						theOffset.x = CGRectGetMinX(displayArea);
+					}
+					
+					if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
+						xArrowOffset += (theOffset.x + theSize.width - CGRectGetMaxX(displayArea));
 						theOffset.x = displayArea.size.width - theSize.width;
 					}
 					
@@ -277,6 +277,9 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					break;
 			}
 			
+			xArrowOffset = roundf(xArrowOffset);
+			yArrowOffset = roundf(yArrowOffset);
+			
 			CGRect bgFrame = CGRectOffset(theBgRect, theOffset.x, theOffset.y);
 			CGRect intersection = CGRectIntersection(displayArea, bgFrame);
 			CGFloat surface = intersection.size.width * intersection.size.height;
@@ -290,17 +293,17 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 			minMargin = MIN(minMargin, minMarginTop);
 			minMargin = MIN(minMargin, minMarginBottom);
 			
-			if (surface >= biggestSurface && minMargin >= currentMinMargin) {
-				biggestSurface = surface;
+			if (surface >= knownLargestSurface) {
+				knownLargestSurface = surface;
 				offset = theOffset;
 				arrowRect = theArrowRect;
 				bgRect = theBgRect;
-				arrowDirection = theArrowDirection;
+				arrowDirection = testingDirection;
 				currentMinMargin = minMargin;
 			}
 		}
 		
-		theArrowDirection <<= 1;
+		testingDirection <<= 1;
 	}
 	
 	switch (arrowDirection) {
@@ -317,6 +320,9 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 			arrowImage = [rightArrowImage retain];
 			break;
 	}
+	
+	NSAssert(!CGRectEqualToRect(bgRect, CGRectNull), @"bgRect must be determined");
+	
 }
 
 @end

@@ -169,8 +169,6 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 			CGRect theArrowRect = CGRectZero;
 			CGPoint theOffset = CGPointZero;
 			
-			CGPoint currentArrowOffset = CGPointZero;
-			
 			CGFloat xArrowOffset = 0.0;
 			CGFloat yArrowOffset = 0.0;
 			CGPoint anchorPoint = CGPointZero;

@@ -162,18 +162,22 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 	
 	UIPopoverArrowDirection testingDirection = UIPopoverArrowDirectionUp;	
 	while (testingDirection <= UIPopoverArrowDirectionRight) {
-		
+	
 		if ((allowedDirections & testingDirection)) {
 		
 			CGRect theBgRect = CGRectZero;
 			CGRect theArrowRect = CGRectZero;
 			CGPoint theOffset = CGPointZero;
+			
+			CGPoint currentArrowOffset = CGPointZero;
+			
 			CGFloat xArrowOffset = 0.0;
 			CGFloat yArrowOffset = 0.0;
 			CGPoint anchorPoint = CGPointZero;
 			
 			switch (testingDirection) {
-				case UIPopoverArrowDirectionUp:
+			
+				case UIPopoverArrowDirectionUp: {
 					
 					anchorPoint = CGPointMake(CGRectGetMidX(anchorRect), CGRectGetMaxY(anchorRect));
 					
@@ -190,7 +194,7 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					
 					if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
 						xArrowOffset += (theOffset.x + theSize.width - CGRectGetMaxX(displayArea));
-						theOffset.x = displayArea.size.width - theSize.width;
+						theOffset.x = CGRectGetMaxX(displayArea) - theSize.width;
 					}
 					
 					//Cap the arrow offset
@@ -200,6 +204,9 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					theArrowRect = CGRectMake(xArrowOffset, yArrowOffset, upArrowImage.size.width, upArrowImage.size.height);
 					
 					break;
+					
+				}
+				
 				case UIPopoverArrowDirectionDown:
 					
 					anchorPoint = CGPointMake(CGRectGetMidX(anchorRect), CGRectGetMinY(anchorRect));
@@ -210,12 +217,14 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					theOffset = CGPointMake(anchorPoint.x - xArrowOffset - downArrowImage.size.width / 2, anchorPoint.y - yArrowOffset - downArrowImage.size.height);
 					theBgRect = CGRectMake(0, 0, theSize.width, theSize.height);
 					
-					if (theOffset.x < 0) {
+					if (theOffset.x < CGRectGetMinX(displayArea)) {
 						xArrowOffset += theOffset.x;
-						theOffset.x = 0;
-					} else if (theOffset.x + theSize.width > displayArea.size.width) {
-						xArrowOffset += (theOffset.x + theSize.width - displayArea.size.width);
-						theOffset.x = displayArea.size.width - theSize.width;
+						theOffset.x = CGRectGetMinX(displayArea);
+					}
+					
+					if (theOffset.x + theSize.width > CGRectGetMaxX(displayArea)) {
+						xArrowOffset += (theOffset.x + theSize.width - CGRectGetMaxX(displayArea));
+						theOffset.x = CGRectGetMaxX(displayArea) - theSize.width;
 					}
 					
 					//Cap the arrow offset
@@ -235,12 +244,14 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					theOffset = CGPointMake(anchorPoint.x - xArrowOffset, anchorPoint.y - yArrowOffset - leftArrowImage.size.height / 2);
 					theBgRect = CGRectMake(0, 0, theSize.width, theSize.height);
 					
-					if (theOffset.y < 0) {
+					if (theOffset.y < CGRectGetMinY(displayArea)) {
 						yArrowOffset += theOffset.y;
-						theOffset.y = 0;
-					} else if (theOffset.y + theSize.height > displayArea.size.height) {
-						yArrowOffset += (theOffset.y + theSize.height - displayArea.size.height);
-						theOffset.y = displayArea.size.height - theSize.height;
+						theOffset.y = CGRectGetMinY(displayArea);
+					}
+					
+					if (theOffset.y + theSize.height > CGRectGetMaxY(displayArea)) {
+						yArrowOffset += (theOffset.y + theSize.height - CGRectGetMaxY(displayArea));
+						theOffset.y = CGRectGetMaxY(displayArea) - theSize.height;
 					}
 					
 					//Cap the arrow offset
@@ -260,12 +271,14 @@ permittedArrowDirections:(UIPopoverArrowDirection)permittedArrowDirections
 					theOffset = CGPointMake(anchorPoint.x - xArrowOffset - rightArrowImage.size.width, anchorPoint.y - yArrowOffset - rightArrowImage.size.height / 2);
 					theBgRect = CGRectMake(0, 0, theSize.width, theSize.height);
 					
-					if (theOffset.y < 0) {
+					if (theOffset.y < CGRectGetMinY(displayArea)) {
 						yArrowOffset += theOffset.y;
-						theOffset.y = 0;
-					} else if (theOffset.y + theSize.height > displayArea.size.height) {
-						yArrowOffset += (theOffset.y + theSize.height - displayArea.size.height);
-						theOffset.y = displayArea.size.height - theSize.height;
+						theOffset.y = CGRectGetMinY(displayArea);
+					}
+					
+					if (theOffset.y + theSize.height > CGRectGetMaxY(displayArea)) {
+						yArrowOffset += (theOffset.y + theSize.height - CGRectGetMaxY(displayArea));
+						theOffset.y = CGRectGetMaxY(displayArea) - theSize.height;
 					}
 					
 					//Cap the arrow offset
